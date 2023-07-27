@@ -8,7 +8,8 @@ The Oakland Community ERC721 NFT Project aims to raise funds for the Oakland com
 
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-- [Smart Contract Development](#smart-contract-development) -[Testing](#Testing)
+- [Smart Contract Development](#smart-contract-development)
+- [Testing](#Testing)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [License](#license)
