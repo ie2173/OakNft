@@ -55,7 +55,7 @@ To deploy the ERC721 smart contract, follow these steps:
 4. Verify the contract on the chosen blockchain explorer.
 5. Record the deployed contract address for future reference.
 
-##Testing
+## Testing
 To run tests for your ERC721 project using Foundry and Truffle, follow these steps:
 
 1. Open a terminal or command prompt.
