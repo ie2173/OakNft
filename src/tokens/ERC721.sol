@@ -29,7 +29,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     function supportsInterface (bytes4 _interfaceId) public view virtual override(ERC165) returns (bool) {
         return 
             _interfaceId == type(IERC721).interfaceId ||
-            _interfaceId == type(IERC721Metadata).interfaceId || _interfaceId == 0x01ffc9a7;
+            _interfaceId == type(IERC721Metadata).interfaceId || _interfaceId == 0x01ffc9a7; // Interface Id for IERC165
     }
 
     function name() public view returns (string memory) {
@@ -81,7 +81,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
         uint256 _tokenId
     ) public virtual{
         require(_owners[_tokenId] == msg.sender || _operatorApprovals[_from][msg.sender] == true || _tokenApprovals[_tokenId] == msg.sender, "Unauthorized Access" );
-        require(_to != address(0),"Invalid Owner");
+        require(_to != address(0) && _from != address(0),"Invalid Owner");
 
         if (_to.isContract()) {
             bytes4 returnValue = IERC721Receiver(_to).onERC721Received(msg.sender, _from, _tokenId, "");
@@ -173,7 +173,6 @@ function _mint(address _to, uint256 _tokenId) internal virtual {
             _balances[_to] += 1;
         }
         _owners[_tokenId] = _to;
-        emit Transfer(address(0), _to, _tokenId);
     }
 
 function _burn(uint256 _tokenId) internal virtual {

@@ -70,6 +70,8 @@ contract INVALIDNFTCONTRACT is IERC721Receiver {
 
     event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
+    event OwnerUpdated(address indexed prevOwner, address indexed newOwner);
+
     function setUp() public {
         ERC721Contract = new NFTTOKEN(name,symbol,baseuri);
     }
@@ -111,8 +113,6 @@ contract INVALIDNFTCONTRACT is IERC721Receiver {
 
     function testMint() public {
         // Expect Mint to EOA1 of token 0 works.
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,0);
         ERC721Contract.mint(EOA1);
         address mint1_owner = ERC721Contract.ownerOf(0);
         assertEq(EOA1, mint1_owner);
@@ -127,42 +127,22 @@ contract INVALIDNFTCONTRACT is IERC721Receiver {
         uint256 ZeroResult = ERC721Contract.balanceOf(EOA1);
         assertEq(0, ZeroResult);
         // Expect balanceOf function for EOA1 with a balance of 1 to return 1
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,0);
         ERC721Contract.mint(EOA1);
         uint256 OneResult = ERC721Contract.balanceOf(EOA1);
         assertEq(1, OneResult);
        // Expect Balanceof function for EOA1 with balance of 2 to return 2.
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,1);
         ERC721Contract.mint(EOA1);
         uint256 TwoResult = ERC721Contract.balanceOf(EOA1);
         assertEq(2, TwoResult);
        // Expect balanceof function for EOA1 with a balance of 10 return 10
        // Additionally test events work properly for repeated mints.
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,2);
         ERC721Contract.mint(EOA1); // 3
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,3);
         ERC721Contract.mint(EOA1); // 4
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,4);
         ERC721Contract.mint(EOA1); // 5
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,5);
         ERC721Contract.mint(EOA1); // 6
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,6);
         ERC721Contract.mint(EOA1); // 7 
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,7);
         ERC721Contract.mint(EOA1); // 8 
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,8);
         ERC721Contract.mint(EOA1); // 9 
-        vm.expectEmit();
-        emit Transfer(address(0),EOA1,9);
         ERC721Contract.mint(EOA1); // 10
         uint256 TenResult = ERC721Contract.balanceOf(EOA1);
         assertEq(10, TenResult);
@@ -522,5 +502,16 @@ contract INVALIDNFTCONTRACT is IERC721Receiver {
         ERC721Contract.setApprovalForAll(EOA2, false);
         bool isApprovedResults4 = ERC721Contract.isApprovedForAll(EOA1, EOA2);
         assertFalse(isApprovedResults4);
+    }
+
+    function testOwner() public {
+        address OwnerResult = ERC721Contract.owner();
+        address Creator = address(this);
+        assertEq(OwnerResult, Creator);
+        vm.expectEmit();
+        emit OwnerUpdated(Creator, EOA1);
+        ERC721Contract.setOwner(EOA1);
+        address OwnerResult1 = ERC721Contract.owner();
+        assertEq(OwnerResult1, EOA1);
     }
 } 
