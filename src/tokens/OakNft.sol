@@ -17,7 +17,7 @@ contract OakNft is ERC721 {
     }
 
     function mint(address _to) public payable {
-        require(msg.value >= 0.001 ether, "Insufficient Mint Value");
+        require(msg.value >= 0.001 ether, "Incorrect Value to purchase NFT");
 
         if (msg.value == 1 ether) {
             _mint(_to, TOKEN_ID);
@@ -57,7 +57,7 @@ contract OakNft is ERC721 {
     }
 
     function withdraw() public onlyOwner payable {
-            require(address(this).balance > 0,"Insufficient Withdrawl Value");
+            require(address(this).balance > 0,"Insufficient Withdrawal Value");
             uint256 ContractAmount = address(this).balance;
             uint256 artistShare = ContractAmount / 2;
             (bool artistSuccess,) = ARTIST.call{value: artistShare}("");

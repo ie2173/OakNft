@@ -63,17 +63,17 @@ contract OakNftTest is Test {
         assertEq(address(Oak721).balance, 1.111 ether);
         //Expect Broke Mint to fail
         vm.startPrank(BROKE);
-        vm.expectRevert("Insufficient Mint Value");
+        vm.expectRevert("Incorrect Value to purchase NFT");
         Oak721.mint(BROKE);
         // Expect Incorrect Value mint to Fail
         hoax(WHALE, 0.5 ether);
-        vm.expectRevert("incorrect Mint Amount");
+        vm.expectRevert("Incorrect Value to purchase NFT");
         Oak721.mint{value: 0.5 ether}(WHALE);
         uint256 Mint4Result = Oak721.balanceOf(WHALE);
         assertEq(Mint4Result, 1);
         //Expect Value of 1.111 mint to Fail
         hoax(FAN, 1.111 ether);
-        vm.expectRevert("incorrect Mint Amount");
+        vm.expectRevert("Incorrect Value to purchase NFT");
         Oak721.mint{value: 1.111 ether}(FAN);
         assertEq(FAN.balance, 1.111 ether);
         //Expect 
@@ -103,7 +103,7 @@ contract OakNftTest is Test {
         assertEq(Mint5Results, 4);
     }
 
-    function testWithdrawl() public {
+    function testWithdrawal() public {
         Oak721.setOwner(OWNER);
         //Expect Whale mint level 4 works.
         hoax(WHALE, 1 ether);
@@ -139,7 +139,7 @@ contract OakNftTest is Test {
         assertEq(OWNER1.balance, .1 ether / 2 + .01 ether / 2 );
         assertEq(address(Oak721).balance, 0);
        //Expect Contract Zero Balance fails
-       vm.expectRevert("Insufficient Withdrawl Value");
+       vm.expectRevert("Insufficient Withdrawal Value");
        Oak721.withdraw();
     }
 }
