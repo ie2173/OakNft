@@ -36,29 +36,29 @@ contract OakNftTest is Test {
         hoax(FAN,0.1 ether);
         assertEq(FAN.balance, 0.1 ether);
         vm.expectEmit();
-        emit Mint(FAN,1,3);
+        emit Mint(FAN,255,3);
         Oak721.mint{value:0.1 ether}(FAN);
         assertEq(FAN.balance, 0);
-        address Mint1Result = Oak721.ownerOf(1);
+        address Mint1Result = Oak721.ownerOf(255);
         assertEq(Mint1Result, FAN);
         //Expect Friend mint of .01 Ether works.
         hoax(FRIEND, 0.01 ether);
         assertEq(FRIEND.balance, 0.01 ether);
         vm.expectEmit();
-        emit Mint(FRIEND,2,2);
+        emit Mint(FRIEND,755,2);
         Oak721.mint{value: 0.01 ether}(FRIEND);
         assertEq(FRIEND.balance, 0);
-        address Mint2Result = Oak721.ownerOf(2);
+        address Mint2Result = Oak721.ownerOf(755);
         assertEq(Mint2Result, FRIEND);
         //Expect Peon mint of .001 Ether works.
         hoax(PEON,0.001 ether);
         assertEq(PEON.balance, 0.001 ether);
         vm.expectEmit();
-        emit Mint(PEON,3,1);
+        emit Mint(PEON,1755,1);
         Oak721.mint{value:0.001 ether}(PEON);
         assertEq(PEON.balance, 0);
-        address Mint3Result = Oak721.ownerOf(0);
-        assertEq(Mint3Result, WHALE);
+        address Mint3Result = Oak721.ownerOf(1755);
+        assertEq(Mint3Result, PEON);
         // Expect Contract Balance to equal 1.111 ether
         assertEq(address(Oak721).balance, 1.111 ether);
         //Expect Broke Mint to fail
@@ -80,27 +80,64 @@ contract OakNftTest is Test {
         
     }
 
-    function testMultipleMint() public {
-        //Expect multiple Whale mints to work
-        deal(WHALE, 1.111 ether);
+    function testTier4SellOut() public {
+        deal(WHALE,255 ether);
         vm.startPrank(WHALE);
-        assertEq(WHALE.balance, 1.111 ether);
-        vm.expectEmit();
-        emit Mint(WHALE, 0, 4);
-        Oak721.mint{value:1 ether}(WHALE);
-        assertEq(WHALE.balance, .111 ether);
-        vm.expectEmit();
-        emit Mint(WHALE, 1, 3);
-        Oak721.mint{value: .1 ether}(WHALE);
-        vm.expectEmit();
-        emit Mint(WHALE, 2, 2);
-        Oak721.mint{value: .01 ether}(WHALE);
-        vm.expectEmit();
-        emit Mint(WHALE, 3, 1);
-        Oak721.mint{value: .001 ether}(WHALE);
-        assertEq(WHALE.balance, 0);
-        uint256 Mint5Results = Oak721.balanceOf(WHALE);
-        assertEq(Mint5Results, 4);
+        for (uint16 i = 0;i<254;i++) {
+            vm.expectEmit();
+            emit Mint(WHALE,i,4);
+            Oak721.mint{value: 1 ether}(WHALE);
+        }
+        uint256 Tier4SelloutResult = Oak721.balanceOf(WHALE);
+        assertEq(Tier4SelloutResult, 254);
+        vm.expectRevert("NFT Sold Out");
+        Oak721.mint{value: 1 ether}(WHALE);
+        assertEq(WHALE.balance, 1 ether);
+        assertEq(address(Oak721).balance, 254 ether);
+    }
+
+    function testTier3Sellout() public{
+        deal(FAN,50 ether);
+        vm.startPrank(FAN);
+       for(uint16 i=0;i<499;i++) {
+            vm.expectEmit();
+            emit Mint(FAN,255 + i,3);
+            Oak721.mint{value: .1 ether}(FAN);
+        }
+        assertEq(FAN.balance, .1 ether);
+        assertEq(address(Oak721).balance, 49.9 ether);
+        vm.expectRevert("NFT Sold Out");
+        Oak721.mint{value:.1 ether}(FAN);
+
+    }
+
+    function testTier2Sellout() public{
+        deal(FRIEND, 10 ether);
+        vm.startPrank(FRIEND);
+        for(uint16 i=0;i<999;i++) {
+            vm.expectEmit();
+            emit Mint(FAN,755 + i,2);
+            Oak721.mint{value: .01 ether}(FAN);
+        }
+        assertEq(FRIEND.balance, .01 ether);
+        assertEq(address(Oak721).balance, 9.99 ether);
+        vm.expectRevert("NFT Sold Out");
+        Oak721.mint{value: .01 ether}(FAN);
+    }
+
+    function testTier1Sellout() public{
+        deal(PEON, 5 ether);
+        vm.startPrank(PEON);
+        for(uint16 i=0;i<4999;i++) {
+            vm.expectEmit();
+            emit Mint(PEON,1755 + i,1);
+            Oak721.mint{value: .001 ether}(PEON);
+        }
+        assertEq(PEON.balance, .001 ether);
+        assertEq(address(Oak721).balance, 4.999 ether);
+        vm.expectRevert("NFT Sold Out");
+        Oak721.mint{value: .001 ether}(PEON);
+
     }
 
     function testWithdrawal() public {
